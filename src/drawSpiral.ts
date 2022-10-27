@@ -1,11 +1,13 @@
-export const drawSpiral = (
+import { unstable_shouldYield } from "scheduler";
+
+export const drawSpiral = function* (
   ctx: CanvasRenderingContext2D,
   width: number,
   tileSize: number,
-  shouldDraw: (cellIdx: number) => boolean
-) => {
+  shouldDraw: (cellIdx: number) => boolean,
+  cellColour: (cellIdx: number) => string = () => "#fff"
+) {
   ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-  ctx.fillStyle = "#f00";
 
   let x = 0;
   let y = 0;
@@ -16,9 +18,11 @@ export const drawSpiral = (
 
   const midX = width / 2;
   const midY = width / 2;
+
   for (let i = 0; i < numCells; i++) {
     if (-width / 2 < x && x <= width / 2 && -width / 2 < y && y <= width / 2) {
       if (shouldDraw(i)) {
+        ctx.fillStyle = cellColour(i);
         ctx.fillRect(midX + x, midY + y, tileSize, tileSize);
       }
     }
@@ -29,5 +33,7 @@ export const drawSpiral = (
 
     x += dx;
     y += dy;
+
+    if (unstable_shouldYield()) yield;
   }
 };
