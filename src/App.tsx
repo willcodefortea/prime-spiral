@@ -53,13 +53,13 @@ function App() {
 
   return (
     <div className="App">
-      <h1>Prime Spiral - with Miller Rabin</h1>
+      <h1>Prime Spiral - with Miller–Rabin</h1>
       <summary className="info">
         Below is a{" "}
         <a href="https://en.wikipedia.org/wiki/Ulam_spiral">prime spiral</a>{" "}
         output, where primality is tested using a{" "}
         <a href="https://en.wikipedia.org/wiki/Miller%E2%80%93Rabin_primality_test">
-          Miller Robin
+          Miller–Rabin
         </a>{" "}
         algorithm. If you reduce the number of iterations, incorrectly
         identified primes will be highlighted. (A good limit for this is 40,
