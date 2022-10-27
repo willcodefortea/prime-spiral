@@ -1,34 +1,61 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import './App.css'
+import { useEffect, useRef, useState, useTransition } from "react";
+import "./App.css";
+import { drawSpiral } from "./drawSpiral";
+import millerRabin from "./millerRabin";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  const [showRandom, setShowRandom] = useState(false);
+  const [numIterations, setNumIterations] = useState(40);
+
+  const width = 500;
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) {
+      return;
+    }
+    const context = canvas.getContext("2d");
+    if (!context) {
+      return;
+    }
+
+    drawSpiral(context, width, 1, (i) => {
+      if (showRandom) return i % 2 === 1 && Math.random() > 0.8;
+      return millerRabin(i, numIterations);
+    });
+  }, [canvasRef.current, drawSpiral, showRandom, numIterations]);
 
   return (
     <div className="App">
+      <canvas
+        className="spiral"
+        ref={canvasRef}
+        width={width}
+        height={width}
+      ></canvas>
+
       <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src="/vite.svg" className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://reactjs.org" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+        <label>
+          Show random?{" "}
+          <input
+            checked={showRandom}
+            type={"checkbox"}
+            onChange={() => setShowRandom((v) => !v)}
+          />
+        </label>
+
+        <label>
+          Num iterations:{" "}
+          <input
+            value={numIterations}
+            onChange={(e) => setNumIterations(e.target.value)}
+          />
+        </label>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;

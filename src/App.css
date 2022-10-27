@@ -39,3 +39,19 @@
 .read-the-docs {
   color: #888;
 }
+
+.spiral {
+  border: 1px solid grey;;
+}
+
+.spiral-row {
+  display: flex;
+}
+
+.spiral-cell {
+  flex: 1
+}
+
+.spiral-cell.active {
+  background-color: green;
+}
