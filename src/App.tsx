@@ -4,14 +4,17 @@ import "./App.css";
 import { drawSpiral } from "./drawSpiral";
 import millerRabin from "./millerRabin";
 
-function App() {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-
-  const [showRandom, setShowRandom] = useState(false);
-  const [numIterations, setNumIterations] = useState(1);
+const usePrimeSpiral = (
+  canvasWidth: number,
+  tileSize: number,
+  showRandom: boolean,
+  numIterations: number,
+  falsePrimesOnly: boolean,
+  highlightFalsePrimes: boolean
+) => {
   const [_, startTransitionEffect] = useTransitionEffect();
-  const [canvasWidth, setCanvasWidth] = useState(300);
-  const [tileSize, setTileSize] = useState(4);
+
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   const [biggestPrime, setBiggestPrime] = useState(2);
 
   useEffect(() => {
@@ -38,6 +41,11 @@ function App() {
           // change the colour if we think we want to draw a prime, but it is in
           // fact, not.
           setBiggestPrime(i);
+
+          if (!highlightFalsePrimes) return "#fff";
+
+          if (falsePrimesOnly)
+            return millerRabin(i, 40) ? "rgba(0, 0, 0, 0)" : "#fff";
           return millerRabin(i, 40) ? "#fff" : "#f00";
         }
       );
@@ -49,7 +57,37 @@ function App() {
     numIterations,
     canvasWidth,
     tileSize,
+    falsePrimesOnly,
+    highlightFalsePrimes,
   ]);
+
+  const canvas = (
+    <canvas
+      className="spiral"
+      ref={canvasRef}
+      width={canvasWidth}
+      height={canvasWidth}
+    ></canvas>
+  );
+
+  return { biggestPrime, canvas };
+};
+
+function App() {
+  const [showRandom, setShowRandom] = useState(false);
+  const [falsePrimesOnly, setFalsePrimesOnly] = useState(false);
+  const [highlightFalsePrimes, setHighlightFalsePrimes] = useState(true);
+  const [numIterations, setNumIterations] = useState(1);
+  const [canvasWidth, setCanvasWidth] = useState(300);
+  const [tileSize, setTileSize] = useState(4);
+  const { biggestPrime, canvas } = usePrimeSpiral(
+    canvasWidth,
+    tileSize,
+    showRandom,
+    numIterations,
+    falsePrimesOnly,
+    highlightFalsePrimes
+  );
 
   return (
     <div className="App">
@@ -79,12 +117,7 @@ function App() {
         </label>
       </div>
 
-      <canvas
-        className="spiral"
-        ref={canvasRef}
-        width={canvasWidth}
-        height={canvasWidth}
-      ></canvas>
+      {canvas}
 
       <div>
         <span className="info">
@@ -116,6 +149,24 @@ function App() {
             value={canvasWidth}
             onChange={(e) => setCanvasWidth(parseInt(e.target.value))}
           ></input>
+        </label>
+
+        <label>
+          Show only false primes?{" "}
+          <input
+            checked={falsePrimesOnly}
+            type={"checkbox"}
+            onChange={() => setFalsePrimesOnly((v) => !v)}
+          />
+        </label>
+
+        <label>
+          Highlight false primes (turn off for speed)?{" "}
+          <input
+            checked={highlightFalsePrimes}
+            type={"checkbox"}
+            onChange={() => setHighlightFalsePrimes((v) => !v)}
+          />
         </label>
       </div>
     </div>
